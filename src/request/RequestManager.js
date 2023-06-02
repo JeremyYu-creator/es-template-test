@@ -2,9 +2,11 @@ import Vue from 'vue';
 import BuildConfig from '@/build/BuildConfig';
 import {
   ESDevelopManager,
-  ESDeviceManager,
+  ESDeviceManager, ESManager,
 } from '@extscreen/es-core';
 import {RuntimeDeviceManager} from "@extscreen/es-runtime";
+import {ESLog} from "@extscreen/es-log";
+const TAG = 'REQUESTMANAGER'
 class RequestManager {
   _requestBaseParams = {};
   init() {
@@ -16,12 +18,24 @@ class RequestManager {
       resolve();
     });
   }
+  initUserInfo(){
+    return new Promise((resolve, reject) => {
+      try {
+        this.initUserRequestBaseParams();
+        Vue.prototype.requestBody = {...Vue.prototype.requestBody,...this._requestBaseParams}
+      } catch (e) {
+        ESLog.e(TAG, `----INITIALIZE---initUserInfo---Error----requestBody will NULL >>>>>${e.errorMsg}`);
+      }
+      ESLog.d(TAG, `----INITIALIZE---initUserInfo---SUCCESS----requestBody >>>>>${JSON.stringify(Vue.prototype.requestBody)}`);
+      resolve();
+    });
+  }
   initRequestBaseParams() {
     this.initDeveloperRequestBaseParams();
     this.initDeviceRequestBaseParams();
     this.initParamsRequestBaseParams();
     this.initUserRequestBaseParams();
-
+    this.initRuntimeData()
     //
     Vue.prototype.requestBody = this._requestBaseParams;
   }
@@ -32,7 +46,7 @@ class RequestManager {
       packagename: BuildConfig.packageName,
       vercode: ESDevelopManager.getVersionCode(),
       vername: ESDevelopManager.getVersionName(),
-      dynamicCode: BuildConfig.VUE_PLUGIN_VERSION,
+      dynamicCode: BuildConfig.ES_APP_VERSION,
     };
 
   }
@@ -66,19 +80,27 @@ class RequestManager {
        channelCode: channel,
        versionCode: ESDevelopManager.getVersionCode(),
      };
-
-     //
      Vue.prototype.versionCode = ESDevelopManager.getVersionCode();
   }
   initUserRequestBaseParams() {
+    // default
     this._requestBaseParams.user = {
-      userId:'',
-      userToken:'',
-      nickname:'',
+      userId: '',
+      userToken: '',
+      nickname: '',
     };
   }
-
-
+  initRuntimeData(){
+    this._requestBaseParams.runtime = {
+      sdkVersion: ESManager.getESSDKVersionName(),
+      sdkCID: ESManager.getESSDKCid(),
+      runtimeID: '',
+      hostPackageName: ESDevelopManager.getPackageName(),
+      hostVersion: ESDevelopManager.getVersionName(),
+      hostChannel: ESDevelopManager.getChannel(),
+      snCode: ''
+    }
+  }
 }
 
 export default new RequestManager();

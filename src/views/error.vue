@@ -28,7 +28,7 @@ export default {
 .error-root-view-css {
   width: 1920px;
   height: 1080px;
-  background-color: darkgray;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;

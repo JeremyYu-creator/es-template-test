@@ -11,8 +11,7 @@ const VERSION_BASE = '1.0'
 import uploadESApp from "./uploadESApp.mjs";
 import BuildConfig from "../src/build/BuildConfig.js";
 
-// let gitNumber = getGitCommit();
-let gitNumber = 12;
+let gitNumber = getGitCommit();
 
 
 let versionName = VERSION_BASE + "." + gitNumber

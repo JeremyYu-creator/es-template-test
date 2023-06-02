@@ -1,4 +1,5 @@
-import {execSync}  from 'child_process'
+import { execSync } from 'child_process'
+let isWin = process.platform === 'win32';
 
 /**
  * 上传扩展屏应用到
@@ -7,31 +8,28 @@ import {execSync}  from 'child_process'
  * @param version
  * @param filePath
  */
-export default function uploadESApp(packageName,outputName,version,filePath,isProduction){
-    // let upload = `curl --location --request POST 'http://api.extscreen.com/v1/tvpver/deploy' \\
-    //       -F'package_name="${packageName}"' \\
-    //       -F 'package_ver="${version}"' \\
-    //       -F 'files=@"${filePath}"'`
-    // let url = isProduction ? 'http://api.extscreen.com/v1/tvpver/deploy'
-    //     : 'http://test-api.extscreen.com/v1/tvpver/deploy'
-    // let upload = `curl --location --request POST '${url}' \\
-    //      --header 'token: 2effc5a07c0007d7d5b078752348617d' \\
-    //     --form 'package_name="${packageName}"' \\
-    //     --form 'package_ver="${version}"' \\
-    //     --form 'files=@"${filePath}"'`
-    // console.log(`start upload cmd :${upload}`)
-    // execSync(upload,{ stdio:'inherit' })
-    let url = isProduction ? 'http://api.extscreen.com/v1/tvpver/deploy'
-        : 'http://test-api.extscreen.com/v1/tvpver/deploy'
-    let header = isProduction ? 'deploy-token: 109ebfb45f1114fa5043cd93b7e7fa79' : 'deploy-token: 91e7c97817accef360029d09752db0c4'
-    console.log(`uploadESApp upload url :${url}`)
-    let upload = `curl --location --request POST '${url}' \\
+export default function uploadESApp(packageName, outputName, version, filePath, isProduction) {
+    // 进行window和mac相关的打包上传判断
+    if (isWin) {
+        let upload = ""
+        if (isProduction) {
+            upload = `curl -H "" -F "package_name=${packageName}" -F "package_ver=${version}" -F "files=@${filePath}" -X POST "${url}"`
+        } else {
+            upload = `curl -H "deploy-token:" -F "package_name=${packageName}" -F "package_ver=${version}" -F "files=@${filePath}" -X POST "${url}"`
+        }
+        console.log(`start upload cmd :${upload}`)
+        execSync(upload, { stdio: 'inherit' })
+    } else {
+        let url = isProduction ? '' : '' // 上传快应用的后台接口
+        let header = isProduction ? 'deploy-token: ' : 'deploy-token: ' //  相关的上传token
+        console.log(`uploadESApp upload url :${url}`)
+        let upload = `curl --location --request POST '${url}' \\
          --header '${header}' \\
         --form 'package_name="${packageName}"' \\
         --form 'package_ver="${version}"' \\
         --form 'files=@"${filePath}"'`
-    console.log(`start upload cmd :${upload}`)
-    execSync(upload,{ stdio:'inherit' })
+        console.log(`start upload cmd :${upload}`)
+        execSync(upload, { stdio: 'inherit' })
+    }
 }
-
 

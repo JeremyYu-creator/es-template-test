@@ -8,9 +8,6 @@
 import {ESLog} from "@extscreen/es-log";
 import {
   ESApplication,
-  ESDevelopManager,
-  ESDeviceManager,
-  ESNetworkManager,
 } from '@extscreen/es-core';
 import {RuntimeDeviceManager} from "@extscreen/es-runtime";
 import RequestManager from "@/request/RequestManager";
@@ -32,20 +29,15 @@ export default {
      * ESApplication 生命周期: onESCreate();
      */
     onESCreate(props) {
-      // saveEsAppBrowseRecord(BuildConfig.packageName)
-      // console.log('----storage1------',BuildConfig.packageName)
       this.initLog();
-      Vue.Native.callNative('FocusModule', 'setDefaultFocusInnerBorderEnable',false);
-        return Promise.resolve()
+      // Vue.Native.callNative('FocusModule', 'setDefaultFocusInnerBorderEnable',false);
+      return Promise.resolve()
+        .then(() => this.initLog())
         .then(() => Promise.all([
           RuntimeDeviceManager.init(),
-          EsModuleManager.init(),
-          ESDevelopManager.init(),
-          ESDeviceManager.init(),
-          ESNetworkManager.init(),
         ]))
-          .then(() => UserManager.init())
         .then(() => RequestManager.init())
+        .then(() => RequestManager.initUserInfo())
     },
     /**
      * 初始化ESLog
